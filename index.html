@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <!-- displays site properly based on user's device -->
+  <link href="./images/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@700&display=swap" rel="stylesheet">
+  <title>Calculator app</title>
+
+  <style>
+    :root{
+      --main-background: hsl(222, 26%, 31%);
+      --display-font-color: rgb(254, 255, 255);
+      --display-background: hsl(224, 36%, 15%);
+      --keypad-background: rgb(37, 45, 68);
+      --key-background: rgb(234, 227, 219);
+      --key-shadow: hsl(224, 28%, 35%);
+      --key-secondary: rgb(162, 179, 225);
+      --third-key: rgb(249, 108, 91);
+      --key-pressed: rgb(255, 255, 255);
+      --primary-active-color: rgb(254, 255, 255);
+      --primary-font-color: rgb(66, 72, 87);
+      --primary-shadow: rgb(240, 235, 231);
+      --secondary-shadow: rgb(65, 78, 113);
+      --third-shadow: hsl(6, 60%, 57%);
+      --white-special: rgb(254, 255, 255);
+    }
+
+    body{
+      background-color: var(--main-background);
+      height: 98vh;
+      width: 98vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .calc-container{
+      height: 550px;
+      width: 400px;
+    }
+
+    .themes{
+      display: flex;
+      justify-content: space-between;
+      font-family: 'League Spartan', sans-serif;
+      font-weight: 700;
+      color: var(--display-font-color);
+    }
+
+    #calc-dis{
+      padding: 30px 10px;
+      margin: 15px 0;
+      width: 95%;
+      border: none;
+      border-radius: 8px;
+      background-color: var(--display-background);
+      font-size: 50px;
+      color: var(--display-font-color);
+      font-family: 'League Spartan', sans-serif;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .keys-container{
+      background-color: var(--keypad-background);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      row-gap: 15px;
+      column-gap: 15px;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .calc-button:active{
+      background-color: var(--key-pressed);
+    }
+
+    /* sample button */
+    .calc-button{
+      background-color: var(--key-background);
+      padding: 8px;
+      border-radius: 5px;
+      font-family: 'League Spartan', sans-serif;
+      font-weight: 700;
+      border: outset;
+      border-color: var(--primary-shadow);
+      border-left-style: none;
+      border-right-style: none;
+      border-top-style: none;
+      font-size: x-large;
+      color: var(--primary-font-color);
+    }
+
+    /* reset button */
+    .reset-button{
+      grid-column-start: 1;
+      grid-column-end: 3;
+      background-color: var(--key-secondary);
+      color: var(--white-special);
+      border-color: var(--secondary-shadow);
+    }
+
+    /* equal button */
+    .equal-button{
+      grid-column-start: 3;
+      grid-column-end: 5;
+      background-color: var(--third-key);
+      border-color: var(--third-shadow);
+      color: var(--white-special);
+    }
+
+    .delete{
+      background-color: var(--key-secondary);
+      border-color: var(--secondary-shadow);
+      color: var(--white-special);
+    }
+
+    .delete:active{
+      background-color: var(--key-pressed);
+    }
+
+    .reset-button:active{
+      background-color: var(--key-pressed);
+    }
+  </style>
+
+  <script>
+    let val = ''
+
+    // trigger eval by pressing enter key //
+    document.addEventListener('keydown', (event) => {
+      if (event.keyCode !== 13) return
+      val = document.getElementById('calc-dis').value
+      final()
+    })
+
+    function storeValueOfDis() {
+      val = document.getElementById('calc-dis').value
+    }
+
+    // get key value and add to string //
+    function storeValue(value) {
+      // condition to stop octal numbers //
+      if (val.includes('0')) {
+        if (val.at(0) === '0') {
+          val = ''
+        }
+        if (val.includes('+0')) {
+          val = val.replace('+0', '+')
+        }
+        if (val.includes('-0')) {
+          val = val.replace('-0', '-')
+        }
+        if (val.includes('*0')) {
+          val = val.replace('*0', '*')
+        }
+        if (val.includes('/0')) {
+          val = val.replace('/0', '/')
+        }
+      }
+      val += String(value)
+
+      // condition to stop duplication of same operators //
+      if (value === '+') {
+        val = val.replace('++', '+')
+      } else if (value === '-') {
+        val = val.replace('--', '-')
+      } else if (value === '*') {
+        val = val.replace('**', '*')
+      } else if (value === '/') {
+        val = val.replace('//', '/')
+      } else if (value === '.') {
+        val = val.replace('..', '.')
+      }
+      document.getElementById('calc-dis').value = val
+    }
+
+    // evaluate final string and show answer on display //
+    function final() {
+      let result = String(eval(val))
+      if (result === 'Infinity') {
+        result = '0'
+      }
+      document.getElementById('calc-dis').value = result
+      val = String(result)
+    }
+
+    function toDelete() {
+      val = val.substring(0, val.length - 1)
+      document.getElementById('calc-dis').value = val
+    }
+
+    function toReset() {
+      document.getElementById('calc-dis').value = 0
+      val = ''
+    }
+
+    function setStyle(value) {
+      const code = document.querySelector(':root')
+
+      if (value === 1) {
+        code.style.setProperty('--main-background', 'hsl(222, 26%, 31%)')
+        code.style.setProperty('--display-font-color', 'rgb(254,255,255)')
+        code.style.setProperty('--display-background', 'hsl(224, 36%, 15%)')
+        code.style.setProperty('--keypad-background', 'rgb(37, 45, 68)')
+        code.style.setProperty('--key-background', 'rgb(234, 227, 219)')
+        code.style.setProperty('--key-shadow', 'hsl(224, 28%, 35%)')
+        code.style.setProperty('--key-secondary', 'rgb(162, 179, 225)')
+        code.style.setProperty('--key-pressed', 'rgb(255, 255, 255)')
+        code.style.setProperty('--third-key', 'rgb(249, 108, 91)')
+        code.style.setProperty('--primary-active-color', 'rgb(254,255,255)')
+        code.style.setProperty('--primary-font-color', 'rgb(66,72,87)')
+        code.style.setProperty('--primary-shadow', '#7481ad')
+        code.style.setProperty('--secondary-shadow', 'rgb(65,78,113)')
+        code.style.setProperty('--third-shadow', 'hsl(6, 60%, 57%)')
+        code.style.setProperty('--white-special', 'rgb(254,255,255)')
+      }
+
+      if (value === 2) {
+        code.style.setProperty('--main-background', 'rgb(230,230,230)')
+        code.style.setProperty('--display-font-color', 'rgb(53,53,44)')
+        code.style.setProperty('--display-background', 'rgb(238,238,238)')
+        code.style.setProperty('--keypad-background', 'rgb(211,205,205)')
+        code.style.setProperty('--key-background', 'rgb(229,228,224)')
+        code.style.setProperty('--key-shadow', 'rgb(166,156,146)')
+        code.style.setProperty('--key-secondary', 'rgb(98,181,189)')
+        code.style.setProperty('--key-pressed', 'rgb(white)')
+        code.style.setProperty('--third-key', 'rgb(255,139,56)')
+        code.style.setProperty('--primary-active-color', 'rgb(255,255,255)')
+        code.style.setProperty('--primary-font-color', 'rgb(55,55,46)')
+        code.style.setProperty('--primary-shadow', 'rgb(211,205,206))')
+        code.style.setProperty('--secondary-shadow', 'rgb(44,86,90)')
+        code.style.setProperty('--third-shadow', 'rgb(121,60,16)')
+        code.style.setProperty('--white-special', 'rgb(254,255,255)')
+      }
+
+      if (value === 3) {
+        code.style.setProperty('--main-background', 'rgb(23,6,42)')
+        code.style.setProperty('--display-font-color', 'rgb(255,230,64)')
+        code.style.setProperty('--display-background', 'rgb(30,8,54)')
+        code.style.setProperty('--keypad-background', 'rgb(30,8,54)')
+        code.style.setProperty('--key-background', 'rgb(51,27,78)')
+        code.style.setProperty('--key-shadow', 'rgb(136,31,160)')
+        code.style.setProperty('--key-secondary', 'rgb(134,49,176)')
+        code.style.setProperty('--key-pressed', 'rgb(106,52,173)')
+        code.style.setProperty('--third-key', 'rgb(148,255,249)')
+        code.style.setProperty('--primary-active-color', 'rgb(134,49,176)')
+        code.style.setProperty('--primary-font-color', 'rgb(255,231,77)')
+        code.style.setProperty('--primary-shadow', 'rgb(191,22,245)')
+        code.style.setProperty('--secondary-shadow', 'rgb(191,21,244)')
+        code.style.setProperty('--third-shadow', 'rgb(110,250,241)')
+        code.style.setProperty('--white-special', 'rgb(254,255,255)')
+      }
+
+    }
+  </script>
+</head>
+<body>
+<div class="calc-container">
+
+  <!-- div for themes -->
+  <div class="themes">
+    <h3>calc</h3>
+    <div class="themes-btn">
+      <input checked id="Choice1" name="contact" onclick="setStyle(1)" type="radio" value="normal">
+      <label for="Choice1">normal</label>
+      <input id="Choice2" name="contact" onclick="setStyle(2)" type="radio" value="light">
+      <label for="Choice2">light</label>
+      <input id="Choice3" name="contact" onclick="setStyle(3)" type="radio" value="purple">
+      <label for="Choice3">purple</label>
+    </div>
+  </div>
+
+  <!-- div for display -->
+  <div class="calc-display" id="cal-display">
+    <label for="calc-dis"></label>
+    <input Size="35" id="calc-dis" name="display" onchange="storeValueOfDis()" placeholder="0" type="text"/>
+  </div>
+
+  <!-- div for keypad -->
+  <div class="keys-container" id="keys">
+    <button class="calc-button" id="7" onclick="storeValue(7)" type="button">7</button>
+    <button class="calc-button" onclick="storeValue(8)" type="button">8</button>
+    <button class="calc-button" onclick="storeValue(9)" type="button">9</button>
+    <button class="calc-button delete" onclick="toDelete('delete')" type="button">DEL</button>
+    <button class="calc-button" onclick="storeValue(4)" type="button">4</button>
+    <button class="calc-button" onclick="storeValue(5)" type="button">5</button>
+    <button class="calc-button" onclick="storeValue(6)" type="button">6</button>
+    <button class="calc-button" onclick="storeValue('+')" type="button">+</button>
+    <button class="calc-button" onclick="storeValue(1)" type="button">1</button>
+    <button class="calc-button" onclick="storeValue(2)" type="button">2</button>
+    <button class="calc-button" onclick="storeValue(3)" type="button">3</button>
+    <button class="calc-button" onclick="storeValue('-')" type="button">-</button>
+    <button class="calc-button" onclick="storeValue('.')" type="button">.</button>
+    <button class="calc-button" onclick="storeValue(0)" type="button">0</button>
+    <button class="calc-button" onclick="storeValue('/')" type="button">/</button>
+    <button class="calc-button" onclick="storeValue('*')" type="button">x</button>
+    <Button class="calc-button reset-button" onclick="toReset()" type="button">RESET</button>
+    <button class="calc-button equal-button" onclick="final()" type="button">=</button>
+  </div>
+</div>
+</body>
+</html>
